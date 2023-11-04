@@ -9,11 +9,10 @@ import jakarta.annotation.Generated;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.config.Task;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -49,7 +48,7 @@ public class ReviewController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Review> getReviewById(@PathVariable Integer id){
+    public ResponseEntity<Review> getReviewById(@PathVariable UUID id){
         Optional<Review> review = reviewService.findById(id);
         if (review.isPresent()){
             return new ResponseEntity<>(review.get(), HttpStatus.OK);
@@ -59,7 +58,7 @@ public class ReviewController {
 
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Review> updateReview(@PathVariable int id, @RequestBody UpdateReviewInput updateReviewInput) {
+    public ResponseEntity<Review> updateReview(@PathVariable UUID id, @RequestBody UpdateReviewInput updateReviewInput) {
         Optional<Review> review = reviewService.findById(id);
 
         if (review.isEmpty()) {
@@ -86,7 +85,7 @@ public class ReviewController {
     }
     
     @DeleteMapping({"/{id}"})
-    public ResponseEntity<Void> deleteTask(@PathVariable int id) {
+    public ResponseEntity<Void> deleteTask(@PathVariable UUID id) {
         reviewService.delete(id);
     
         return ResponseEntity.noContent().build();
