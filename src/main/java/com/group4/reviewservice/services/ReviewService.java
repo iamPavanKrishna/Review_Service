@@ -1,43 +1,21 @@
 package com.group4.reviewservice.services;
 
 import com.group4.reviewservice.models.Review;
-import com.group4.reviewservice.repos.ReviewRepository;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
 @Service
-public class ReviewService {
+public interface ReviewService {
 
-    private final ReviewRepository reviewRepository;
+    public Review create(Review review);
 
-    public ReviewService(ReviewRepository reviewRepository) {
-        this.reviewRepository = reviewRepository;
-    }
+    public List<Review> findAll();
 
-    public Review create(Review review) {
-        return reviewRepository.save(review);
-    }
+    public Optional<Review> findById(String id);
 
-    public List<Review> findAll() {
-        List<Review> review = new ArrayList<>();
-        reviewRepository.findAll().forEach(review::add);
+    public Review update(Review review);
 
-        return review;
-    }
-
-    public Optional<Review> findById(UUID id) {
-        return reviewRepository.findById(id);
-    }
-
-    public Review update(Review review) {
-        return reviewRepository.save(review);
-    }
-
-    public void delete(UUID id) {
-        reviewRepository.deleteById(id);
-    }
+    public void delete(String id);
 }
