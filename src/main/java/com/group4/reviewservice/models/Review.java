@@ -7,16 +7,17 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Table(name = "reviews")
 @Entity
 public class Review extends BaseModel{
 
     @Column(nullable = false)
-    private Long userId; // TODO: change it to user object
+    private UUID userId; // TODO: change it to user object
 
     @Column(nullable = false)
-    private Long serviceId; // TODO: change it to service object
+    private UUID serviceId; // TODO: change it to service object
 
     @Column(nullable = false)
     private Integer stars;
@@ -53,11 +54,11 @@ public class Review extends BaseModel{
 
     //Getters
 
-    public Long getUserId() {
+    public UUID getUserId() {
         return userId;
     }
     
-    public Long getServiceId() {
+    public UUID getServiceId() {
         return serviceId;
     }
 
@@ -99,12 +100,12 @@ public class Review extends BaseModel{
 
     //Setters
 
-    public Review setUserId(Long userId) {
+    public Review setUserId(UUID userId) {
         this.userId = userId;
         return this;
     }
 
-    public Review setServiceId(Long serviceId) {
+    public Review setServiceId(UUID serviceId) {
         this.serviceId = serviceId;
         return this;
     }
