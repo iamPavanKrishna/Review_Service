@@ -14,10 +14,10 @@ import java.util.UUID;
 public class Review extends BaseModel{
 
     @Column(nullable = false)
-    private UUID userId; // TODO: change it to user object
+    private UUID userId;
 
     @Column(nullable = false)
-    private UUID serviceId; // TODO: change it to service object
+    private UUID serviceId;
 
     @Column(nullable = false)
     private Integer stars;

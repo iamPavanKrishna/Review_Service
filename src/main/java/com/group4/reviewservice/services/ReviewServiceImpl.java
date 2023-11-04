@@ -36,6 +36,12 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
+    public List<Review> findAllByServiceId(UUID id){
+        return  reviewRepository.findAllByServiceId((id));
+
+    }
+
+    @Override
     public Optional<Review> findById(String id) {
         return reviewRepository.findById(UUID.fromString(id));
     }

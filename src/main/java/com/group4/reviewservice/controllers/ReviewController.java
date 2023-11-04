@@ -7,6 +7,7 @@ import com.group4.reviewservice.services.ReviewService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,12 @@ public class ReviewController {
     @GetMapping
     public ResponseEntity<List<Review>> getAllReviews(){
         List<Review> reviews = reviewService.findAll();
+        return new ResponseEntity<>(reviews, HttpStatus.OK);
+    }
+
+    @GetMapping("/getservicereview/{id}")
+    public ResponseEntity<List<Review>> getAllReviewsByServiceId(@PathVariable UUID id){
+        List<Review> reviews = reviewService.findAllByServiceId(id);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
