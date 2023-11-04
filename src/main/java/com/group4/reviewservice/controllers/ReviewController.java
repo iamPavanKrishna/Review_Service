@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/reviews")
 public class ReviewController {
     public ReviewService reviewService;
     
@@ -34,20 +35,20 @@ public class ReviewController {
     }
 
     // CreateReview
-    @PostMapping("/r")
+    @PostMapping
     public ResponseEntity<Review> createReview(@RequestBody CreateReviewInput createReviewInput){
         Review review = reviewService.create(createReviewInput.toReview());
         
         return new ResponseEntity<>(review, HttpStatus.CREATED);
     }
 
-    @GetMapping("/r")
+    @GetMapping
     public ResponseEntity<List<Review>> getAllReviews(){
         List<Review> reviews = reviewService.findAll();
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
-    @GetMapping("/r/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Review> getReviewById(@PathVariable Integer id){
         Optional<Review> review = reviewService.findById(id);
         if (review.isPresent()){
