@@ -18,9 +18,6 @@ public class Review extends BaseModel{
 
     @Column(nullable = false)
     private UUID serviceId;
-
-    @Column(nullable = false)
-    private Integer stars;
     
     @CreationTimestamp
     @Column(updatable = false, name = "created_at")
@@ -60,10 +57,6 @@ public class Review extends BaseModel{
     
     public UUID getServiceId() {
         return serviceId;
-    }
-
-    public Integer getStars() {
-        return stars;
     }
 
     public Date getCreatedAt() {
@@ -107,11 +100,6 @@ public class Review extends BaseModel{
 
     public Review setServiceId(UUID serviceId) {
         this.serviceId = serviceId;
-        return this;
-    }
-
-    public Review setStars(Integer stars) {
-        this.stars = stars;
         return this;
     }
 
@@ -162,7 +150,6 @@ public class Review extends BaseModel{
         return "Review{" +
                 "userId=" + userId +
                 ", serviceId=" + serviceId +
-                ", stars=" + stars +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 ", text='" + text + '\'' +
