@@ -42,7 +42,7 @@ public class Review extends BaseModel{
     @Column(nullable = false)
     private String cool;
 
-    @Column(nullable = false, columnDefinition = "varchar(20) not null default 'PENDING'")
+    @Column(nullable = false, columnDefinition = "varchar(20) not null")
     @Enumerated(EnumType.STRING)
     private AttacthmentTypeEnum attacthmentTypeEnum;
 
