@@ -1,13 +1,5 @@
 version: "3.8"
 services:
-  review_service_api:
-    build: .
-    restart: always
-    ports:
-      - 8080:8080
-    depends_on:
-      - mysqldb
-      
   mysqldb:
     image: "mysql:8.0"
     restart: always
@@ -18,3 +10,19 @@ services:
       MYSQL_USER: reviewservice
       MYSQL_PASSWORD: reviewservice
       MYSQL_ROOT_PASSWORD: reviewservice
+    healthcheck:
+            test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+            timeout: 20s
+            retries: 30
+
+  review_service_api:
+    build: .
+    restart: on-failure
+    ports:
+      - 8080:8080
+    depends_on:
+      - mysqldb
+    environment:
+      - SLEEP_LENGTH=10
+    
+    
