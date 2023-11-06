@@ -50,6 +50,13 @@ public class ReviewController {
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
+    @GetMapping("/getreviewbyuser/{id}")
+    public ResponseEntity<List<Review>> getAllReviewsByUserId(@PathVariable UUID id)   
+            throws NotFoundException, TPAServiceException, InternalServerException {
+        List<Review> reviews = reviewService.getAllReviewsByUserId(id);
+        return new ResponseEntity<>(reviews, HttpStatus.OK);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Review> getReviewById(@PathVariable String id) 
             throws NotFoundException, InternalServerException {
