@@ -1,5 +1,6 @@
 package com.group4.reviewservice.services;
 
+import com.group4.reviewservice.exceptions.*;
 import com.group4.reviewservice.models.Review;
 import java.util.List;
 import java.util.Optional;
@@ -10,15 +11,24 @@ import org.springframework.stereotype.Service;
 @Service
 public interface ReviewService {
 
-    public Review create(Review review);
+    public Review submitReview(Review review) 
+            throws NotFoundException, TPAServiceException, InternalServerException, BadRequestException;
 
-    public List<Review> findAll();
+    public List<Review> getAllReviews()   
+            throws NotFoundException, TPAServiceException, InternalServerException;
 
-    List<Review> findAllByServiceId(UUID id);
+    List<Review> getAllReviewsByServiceId(UUID id)   
+            throws NotFoundException, TPAServiceException, InternalServerException;
 
-    public Optional<Review> findById(String id);
+    List<Review> getAllReviewsByUserId(UUID id)   
+            throws NotFoundException, TPAServiceException, InternalServerException;
 
-    public Review update(Review review);
+    public Optional<Review> getReviewById(String id) 
+            throws NotFoundException, InternalServerException;
 
-    public void delete(String id);
+    public Review updateReview(Review review)   
+            throws NotFoundException, InternalServerException, BadRequestException;
+
+    public void deleteReview(String id)  
+            throws NotFoundException, InternalServerException;
 }
