@@ -10,4 +10,6 @@ COPY mvnw.cmd /home/app/mnvw.cmd
 RUN mvn -f /home/app/pom.xml clean package
 EXPOSE 8080
 
-ENTRYPOINT ["java","-jar","/home/app/target/review_service-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java","-jar","/home/app/target/review-management-service.jar"]
+
+# java,-jar,/home/app/target/review-management-service.jar
