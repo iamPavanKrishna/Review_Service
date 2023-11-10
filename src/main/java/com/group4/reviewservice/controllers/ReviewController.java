@@ -30,7 +30,7 @@ public class ReviewController {
     // CreateReview
     @PostMapping
     public ResponseEntity<String> createReview(@RequestBody CreateReviewInput createReviewInput) 
-            throws NotFoundException, TPAServiceException, InternalServerException, BadRequestException{
+            throws NotFoundException, TPAServiceException, InternalServerException {
         reviewService.submitReview(createReviewInput.toReview());
  
         return new ResponseEntity<>("Review Submitted", HttpStatus.CREATED);
@@ -45,21 +45,21 @@ public class ReviewController {
 
     @GetMapping("/getreviewbyservice/{id}")
     public ResponseEntity<List<Review>> getAllReviewsByServiceId(@PathVariable UUID id)   
-            throws NotFoundException, TPAServiceException, InternalServerException {
+            throws NotFoundException, TPAServiceException, InternalServerException, BadRequestException {
         List<Review> reviews = reviewService.getAllReviewsByServiceId(id);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
     @GetMapping("/getreviewbyuser/{id}")
     public ResponseEntity<List<Review>> getAllReviewsByUserId(@PathVariable UUID id)   
-            throws NotFoundException, TPAServiceException, InternalServerException {
+            throws NotFoundException, TPAServiceException, InternalServerException, BadRequestException {
         List<Review> reviews = reviewService.getAllReviewsByUserId(id);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Review> getReviewById(@PathVariable String id) 
-            throws NotFoundException, InternalServerException {
+            throws NotFoundException, InternalServerException, BadRequestException {
         Optional<Review> review = reviewService.getReviewById(id);
         if (review.isPresent()){
             return new ResponseEntity<>(review.get(), HttpStatus.OK);
@@ -79,14 +79,15 @@ public class ReviewController {
 
         Review reviewToUpdate = review.get();
 
-        reviewToUpdate.setUserId(updateReviewInput.userId())
-        .setServiceId(updateReviewInput.serviceId())
-        .setText(updateReviewInput.text())
-        .setUseful(updateReviewInput.useful())
-        .setFunny(updateReviewInput.funny())
-        .setCool(updateReviewInput.cool())
-        .setAttacthmentTypeEnum(updateReviewInput.attacthmentTypeEnum())
-        .setAttachmentUrl(updateReviewInput.attachmentUrl());
+        Review.builder()
+        .userId(updateReviewInput.userId())
+        .serviceId(updateReviewInput.serviceId())
+        .text(updateReviewInput.text())
+        .likes(updateReviewInput.likes())
+        .dislikes(updateReviewInput.dislikes())
+        .attacthmentTypeEnum(updateReviewInput.attacthmentTypeEnum())
+        .attachmentUrl(updateReviewInput.attachmentUrl())
+        .build();
 
         Review reviewUpdated = reviewService.updateReview(reviewToUpdate);
 
@@ -95,8 +96,28 @@ public class ReviewController {
     
     @DeleteMapping({"/delete/{id}"})
     public ResponseEntity<Void> deleteTask(@PathVariable String id)  
-            throws NotFoundException, InternalServerException {
+            throws NotFoundException, InternalServerException, BadRequestException {
         reviewService.deleteReview(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{reviewId}/like")
+    public ResponseEntity<Review> likeReview(@PathVariable UUID reviewId) {
+        try {
+            Review likedReview = reviewService.likeReview(reviewId);
+            return new ResponseEntity<>(likedReview, HttpStatus.OK);
+        } catch (NotFoundException | InternalServerException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("/{reviewId}/dislike")
+    public ResponseEntity<Review> dislikeReview(@PathVariable UUID reviewId) {
+        try {
+            Review dislikedReview = reviewService.dislikeReview(reviewId);
+            return new ResponseEntity<>(dislikedReview, HttpStatus.OK);
+        } catch (NotFoundException | InternalServerException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }
