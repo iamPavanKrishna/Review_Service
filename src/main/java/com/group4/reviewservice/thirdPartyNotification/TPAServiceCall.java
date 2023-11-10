@@ -1,7 +1,8 @@
 package com.group4.reviewservice.thirdPartyNotification;
 
-import com.group4.reviewservice.dtos.NotificationRequestDto;
-import com.group4.reviewservice.dtos.NotificationResponseDto;
+import com.group4.reviewservice.dtos.requests.NotificationRequest;
+import com.group4.reviewservice.dtos.responses.NotificationResponse;
+
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,15 +16,10 @@ public class TPAServiceCall {
     public TPAServiceCall(RestTemplateBuilder restTemplateBuilder){
         this.restTemplate = restTemplateBuilder.build();
     }
-    public NotificationResponseDto sendnotification(NotificationRequestDto notificationRequestDto, String url) {
+    public NotificationResponse sendnotification(NotificationRequest notificationRequest, String url) {
 
-        ResponseEntity<NotificationResponseDto> response = restTemplate.postForEntity(url, notificationRequestDto, NotificationResponseDto.class);  // TODO  restTemplate.exchange
-
-        System.out.println("dafsjkfktdyuu ");
+        ResponseEntity<NotificationResponse> response = restTemplate.postForEntity(url, notificationRequest, NotificationResponse.class);
 
         return response.getBody();
-
-
-
     }
 }
