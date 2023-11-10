@@ -5,20 +5,17 @@ import java.util.UUID;
 import com.group4.reviewservice.enums.AttacthmentTypeEnum;
 import com.group4.reviewservice.models.Review;
 
-public record CreateReviewInput(UUID userId, UUID serviceId, String text, String useful, String funny, String cool, AttacthmentTypeEnum attachmentTypeEnum, String attachmentUrl) {
+public record CreateReviewInput(UUID userId, UUID serviceId, String text, Long likes, Long dislikes, AttacthmentTypeEnum attachmentTypeEnum, String attachmentUrl) {
     public Review toReview() {
-        Review review = new Review();
 
-        review.setUserId(userId)
-        .setServiceId(serviceId)
-        .setText(text)
-        .setUseful(useful)
-        .setFunny(funny)
-        .setCool(cool)
-        .setAttacthmentTypeEnum(attachmentTypeEnum)
-        .setAttachmentUrl(attachmentUrl);
-        
-
-        return review;
+        return Review.builder()
+        .userId(userId)
+        .serviceId(serviceId)
+        .text(text)
+        .likes(likes)
+        .dislikes(dislikes)
+        .attacthmentTypeEnum(attachmentTypeEnum)
+        .attachmentUrl(attachmentUrl)
+        .build();
     }
 }
