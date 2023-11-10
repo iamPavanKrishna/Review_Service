@@ -1,6 +1,6 @@
 package com.group4.reviewservice.enums;
 
-public enum AttacthmentTypeEnum {
+public enum AttachmentTypeEnum {
     IMAGE,
     VIDEO,
     AUDIO,
