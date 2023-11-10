@@ -15,9 +15,9 @@ public class TPAServiceCall {
     public TPAServiceCall(RestTemplateBuilder restTemplateBuilder){
         this.restTemplate = restTemplateBuilder.build();
     }
-    public NotificationResponseDto sendnotification(NotificationRequestDto notificationRequestDto) {
+    public NotificationResponseDto sendnotification(NotificationRequestDto notificationRequestDto, String url) {
 
-        ResponseEntity<NotificationResponseDto> response = restTemplate.postForEntity("http://localhost:3000/notification/send/b4827950-9373-469c-bf60-e1d2cf14330f", notificationRequestDto, NotificationResponseDto.class);  // TODO  restTemplate.exchange
+        ResponseEntity<NotificationResponseDto> response = restTemplate.postForEntity(url, notificationRequestDto, NotificationResponseDto.class);  // TODO  restTemplate.exchange
 
         System.out.println("dafsjkfktdyuu ");
 
