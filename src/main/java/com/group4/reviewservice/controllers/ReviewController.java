@@ -1,9 +1,10 @@
 package com.group4.reviewservice.controllers;
 
+import com.group4.reviewservice.dtos.requests.CreateReviewInput;
+import com.group4.reviewservice.dtos.requests.UpdateReviewInput;
+import com.group4.reviewservice.enums.ReactionTypeEnum;
 import com.group4.reviewservice.exceptions.*;
 import com.group4.reviewservice.models.Review;
-import com.group4.reviewservice.requests.CreateReviewInput;
-import com.group4.reviewservice.requests.UpdateReviewInput;
 import com.group4.reviewservice.services.ReviewServiceImpl;
 
 import java.util.List;
@@ -45,14 +46,14 @@ public class ReviewController {
 
     @GetMapping("/getreviewbyservice/{id}")
     public ResponseEntity<List<Review>> getAllReviewsByServiceId(@PathVariable UUID id)   
-            throws NotFoundException, TPAServiceException, InternalServerException, BadRequestException {
+            throws NotFoundException, InternalServerException, BadRequestException {
         List<Review> reviews = reviewService.getAllReviewsByServiceId(id);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
     @GetMapping("/getreviewbyuser/{id}")
     public ResponseEntity<List<Review>> getAllReviewsByUserId(@PathVariable UUID id)   
-            throws NotFoundException, TPAServiceException, InternalServerException, BadRequestException {
+            throws NotFoundException, InternalServerException, BadRequestException {
         List<Review> reviews = reviewService.getAllReviewsByUserId(id);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
@@ -70,24 +71,21 @@ public class ReviewController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Review> updateReview(@PathVariable String id, @RequestBody UpdateReviewInput updateReviewInput)   
-            throws NotFoundException, InternalServerException, BadRequestException {
+            throws NotFoundException, InternalServerException, BadRequestException, TPAServiceException {
         Optional<Review> review = reviewService.getReviewById(id);
 
         if (review.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        Review reviewToUpdate = review.get();
+        Review reviewToUpdate = new Review();
 
-        Review.builder()
-        .userId(updateReviewInput.userId())
-        .serviceId(updateReviewInput.serviceId())
-        .text(updateReviewInput.text())
-        .likes(updateReviewInput.likes())
-        .dislikes(updateReviewInput.dislikes())
-        .attacthmentTypeEnum(updateReviewInput.attacthmentTypeEnum())
-        .attachmentUrl(updateReviewInput.attachmentUrl())
-        .build();
+        reviewToUpdate.setId(UUID.fromString(id));
+        reviewToUpdate.setUserId(updateReviewInput.userId());
+        reviewToUpdate.setServiceId(updateReviewInput.serviceId());
+        reviewToUpdate.setText(updateReviewInput.text());
+        reviewToUpdate.setAttachmentTypeEnum(updateReviewInput.attachmentTypeEnum());
+        reviewToUpdate.setAttachmentUrl(updateReviewInput.attachmentUrl());
 
         Review reviewUpdated = reviewService.updateReview(reviewToUpdate);
 
@@ -96,28 +94,15 @@ public class ReviewController {
     
     @DeleteMapping({"/delete/{id}"})
     public ResponseEntity<Void> deleteTask(@PathVariable String id)  
-            throws NotFoundException, InternalServerException, BadRequestException {
+            throws NotFoundException, InternalServerException, BadRequestException, TPAServiceException {
         reviewService.deleteReview(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{reviewId}/like")
-    public ResponseEntity<Review> likeReview(@PathVariable UUID reviewId) {
-        try {
-            Review likedReview = reviewService.likeReview(reviewId);
-            return new ResponseEntity<>(likedReview, HttpStatus.OK);
-        } catch (NotFoundException | InternalServerException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PostMapping("/{reviewId}/dislike")
-    public ResponseEntity<Review> dislikeReview(@PathVariable UUID reviewId) {
-        try {
-            Review dislikedReview = reviewService.dislikeReview(reviewId);
-            return new ResponseEntity<>(dislikedReview, HttpStatus.OK);
-        } catch (NotFoundException | InternalServerException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    @PostMapping("/react/{reviewId}/{reactionType}/{userId}")
+    public ResponseEntity<Void> reactToReview(@PathVariable String reviewId, @PathVariable String reactionType, @PathVariable String userId) 
+            throws NotFoundException, InternalServerException, BadRequestException {
+        reviewService.reactToReview(UUID.fromString(reviewId), ReactionTypeEnum.fromString(reactionType), UUID.fromString(userId));
+        return ResponseEntity.noContent().build();
     }
 }
