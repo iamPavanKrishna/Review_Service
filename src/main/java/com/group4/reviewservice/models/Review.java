@@ -1,6 +1,6 @@
 package com.group4.reviewservice.models;
 
-import com.group4.reviewservice.enums.AttacthmentTypeEnum;
+import com.group4.reviewservice.enums.AttachmentTypeEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,27 +44,51 @@ public class Review{
     @Column(length = 200, nullable = false)
     private String text;
 
-    @Column(nullable = false, columnDefinition = "varchar(20) not null")
+    @Column(nullable = false, columnDefinition = "varchar(20)")
     @Enumerated(EnumType.STRING)
-    private AttacthmentTypeEnum attacthmentTypeEnum;
+    private AttachmentTypeEnum attachmentTypeEnum;
 
     @Column(nullable = false)
     private String attachmentUrl;
 
     @Column(nullable = false)
-    private Long likes = 0L;  // Default value is 0
+    private int usefulCount;
 
     @Column(nullable = false)
-    private Long dislikes = 0L;  // Default value is 0
+    private int funnyCount;
 
-    // Other methods...
+    @Column(nullable = false)
+    private int coolCount;
 
-    public void incrementLikes() {
-        this.likes++;
+    // Create methods to increment and decrement reactions
+    public void incrementUseful() {
+        usefulCount++;
     }
 
-    public void incrementDislikes() {
-        this.dislikes++;
+    public void decrementUseful() {
+        if (usefulCount > 0) {
+            usefulCount--;
+        }
+    }
+
+    public void incrementFunny() {
+        funnyCount++;
+    }
+
+    public void decrementFunny() {
+        if (funnyCount > 0) {
+            funnyCount--;
+        }
+    }
+
+    public void incrementCool() {
+        coolCount++;
+    }
+
+    public void decrementCool() {
+        if (coolCount > 0) {
+            coolCount--;
+        }
     }
 
 }
