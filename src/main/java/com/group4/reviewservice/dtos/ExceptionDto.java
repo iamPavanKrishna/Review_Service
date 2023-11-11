@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
+// This ExceptionDto is a Data Transfer Object for Exception Handling
 @Getter
 @Setter
 public class ExceptionDto {

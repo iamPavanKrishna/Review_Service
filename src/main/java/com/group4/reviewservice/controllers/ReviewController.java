@@ -28,7 +28,7 @@ public class ReviewController {
         this.reviewService = reviewService;
     }
 
-    // CreateReview
+    // API route to create a Review
     @PostMapping
     public ResponseEntity<String> createReview(@RequestBody CreateReviewInput createReviewInput) 
             throws NotFoundException, TPAServiceException, InternalServerException {
@@ -37,6 +37,7 @@ public class ReviewController {
         return new ResponseEntity<>("Review Submitted", HttpStatus.CREATED);
     }
 
+    // API route to fetch all Reviews
     @GetMapping
     public ResponseEntity<List<Review>> getAllReviews()   
             throws NotFoundException, TPAServiceException, InternalServerException {
@@ -44,13 +45,15 @@ public class ReviewController {
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
+    // API route to fetch all reviews of a particular service
     @GetMapping("/getreviewbyservice/{id}")
     public ResponseEntity<List<Review>> getAllReviewsByServiceId(@PathVariable UUID id)   
-            throws NotFoundException, InternalServerException, BadRequestException {
+            throws NotFoundException, BadRequestException {
         List<Review> reviews = reviewService.getAllReviewsByServiceId(id);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
+    // API route to fetch all reviews of a particular user
     @GetMapping("/getreviewbyuser/{id}")
     public ResponseEntity<List<Review>> getAllReviewsByUserId(@PathVariable UUID id)   
             throws NotFoundException, InternalServerException, BadRequestException {
@@ -58,6 +61,7 @@ public class ReviewController {
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
+    // API route to fetch a Review by id
     @GetMapping("/{id}")
     public ResponseEntity<Review> getReviewById(@PathVariable String id) 
             throws NotFoundException, InternalServerException, BadRequestException {
@@ -68,7 +72,7 @@ public class ReviewController {
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
-
+    // API route to update a Review by id
     @PutMapping("/update/{id}")
     public ResponseEntity<Review> updateReview(@PathVariable String id, @RequestBody UpdateReviewInput updateReviewInput)   
             throws NotFoundException, InternalServerException, BadRequestException, TPAServiceException {
@@ -91,7 +95,8 @@ public class ReviewController {
 
         return new ResponseEntity<>(reviewUpdated, HttpStatus.OK);
     }
-    
+
+    // API route to delete a Review by id
     @DeleteMapping({"/delete/{id}"})
     public ResponseEntity<Void> deleteTask(@PathVariable String id)  
             throws NotFoundException, InternalServerException, BadRequestException, TPAServiceException {
@@ -99,6 +104,7 @@ public class ReviewController {
         return ResponseEntity.noContent().build();
     }
 
+    // API route to add user specific reaction to the review
     @PostMapping("/react/{reviewId}/{reactionType}/{userId}")
     public ResponseEntity<Void> reactToReview(@PathVariable String reviewId, @PathVariable String reactionType, @PathVariable String userId) 
             throws NotFoundException, InternalServerException, BadRequestException {

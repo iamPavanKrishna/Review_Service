@@ -1,4 +1,4 @@
-package com.group4.reviewservice.thirdPartyNotification;
+package com.group4.reviewservice.NotificationsService;
 
 import com.group4.reviewservice.dtos.requests.NotificationRequest;
 import com.group4.reviewservice.dtos.responses.NotificationResponse;
@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
-public class TPAServiceCall {
+public class NotificationServiceCall {
 
     private RestTemplate restTemplate;
 
-    public TPAServiceCall(RestTemplateBuilder restTemplateBuilder){
+    public NotificationServiceCall(RestTemplateBuilder restTemplateBuilder){
         this.restTemplate = restTemplateBuilder.build();
     }
     public NotificationResponse sendnotification(NotificationRequest notificationRequest, String url) {

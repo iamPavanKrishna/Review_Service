@@ -10,8 +10,10 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+
+// This a Data Access Layer for the UserReaction Database
 @Repository
 public interface UserReactionRepository extends JpaRepository<UserReaction, UUID> {
     
-    Optional<UserReaction> findByReviewAndUserIdAndReactionType(Review review, UUID userId, ReactionTypeEnum reactionType);
+    Optional<UserReaction> findByReviewAndUserIdAndReactionType(Review review, UUID userId, ReactionTypeEnum reactionType);  // This method fetches the review by mapping review, userId, reactionType
 }

@@ -13,11 +13,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.group4.reviewservice.thirdPartyNotification.TPAServiceCall;
+import com.group4.reviewservice.NotificationsService.NotificationServiceCall;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+
+// This is the Implementation of the Service Calls
 @Service("ReviewService")
 @Primary
 @RequiredArgsConstructor
@@ -25,10 +27,11 @@ public class ReviewServiceImpl implements ReviewService{
 
     private final ReviewRepository reviewRepository;
     private final UserReactionRepository userReactionRepository;
-    private final TPAServiceCall tpaServiceCall;
+    private final NotificationServiceCall tpaServiceCall;
     private String baseNotificationUrl = "http://notificationservice.eu-north-1.elasticbeanstalk.com/notification/send/";
 
 
+    // This is the implementation of the abstract method for submitting a review
     @Override
     public Review submitReview(Review review) 
         throws NotFoundException, TPAServiceException, InternalServerException {
@@ -39,6 +42,7 @@ public class ReviewServiceImpl implements ReviewService{
         } catch (Exception e) {
             throw new InternalServerException("Internal Server Error: Error Submitting Review");
         }
+        // Calling the Third Party Notification Service
         NotificationRequest notificationRequest = new NotificationRequest(
                 respReview.getServiceId().toString(),
                 "Review is successfully submitted",
@@ -57,6 +61,8 @@ public class ReviewServiceImpl implements ReviewService{
         return respReview;            
     }
 
+
+    // This is the implementation of the abstract method for submitting a review
     @Override
     public List<Review> getAllReviews()   
         throws NotFoundException, InternalServerException {
@@ -71,15 +77,15 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
-    public List<Review> getAllReviewsByServiceId(UUID id)    
-        throws NotFoundException, InternalServerException, BadRequestException {
+    public List<Review> getAllReviewsByServiceId(UUID id)
+        throws NotFoundException, BadRequestException {
         if (id == null) {
                 throw new BadRequestException("Service ID is required");
             }
         try{
             return reviewRepository.getAllReviewsByServiceId(id);
         } catch (Exception e) {
-            throw new InternalServerException("Internal Server Error: Unable to fetch reviews at the moment...");
+            throw new NotFoundException("No Review is found with serviceId: "+id);
         }
     }
 
@@ -104,10 +110,13 @@ public class ReviewServiceImpl implements ReviewService{
             throw new BadRequestException("Review ID is required");
         }
         try {
-            return Optional.ofNullable(reviewRepository.findById(UUID.fromString(id)))
-                            .orElseThrow(() -> new NotFoundException("Review not found with ID: " + id));
+            Optional<Review> reviewOptional = reviewRepository.findById(UUID.fromString(id));
+            if (!reviewOptional.isPresent()) {
+                throw new NotFoundException("Review not found with ID: " + id);
+            }
+            return reviewOptional;
         } catch (Exception e) {
-            throw new InternalServerException("Internal Server Error: Review Management Service is down...");
+            throw new NotFoundException(e.getMessage());
         }
     }
 
@@ -145,8 +154,8 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
-    public void deleteReview(String id)  
-        throws NotFoundException, InternalServerException, BadRequestException, TPAServiceException {
+    public void deleteReview(String id)
+            throws NotFoundException, BadRequestException, TPAServiceException, InternalServerException {
         Review respReview = getReviewById(id).orElseThrow(() -> new NotFoundException("Review not found with ID: " + id));
         if (id == null || id.isEmpty()) {
             throw new BadRequestException("Review ID is required");
@@ -171,7 +180,7 @@ public class ReviewServiceImpl implements ReviewService{
        }
     }
 
-    public void reactToReview(UUID reviewId, ReactionTypeEnum reactionType, UUID userId) 
+    public void reactToReview(UUID reviewId, ReactionTypeEnum reactionType, UUID userId)
         throws NotFoundException, InternalServerException, BadRequestException {
         if (reviewId == null || reviewId.toString().isEmpty()) {
             throw new BadRequestException("Review ID is required");

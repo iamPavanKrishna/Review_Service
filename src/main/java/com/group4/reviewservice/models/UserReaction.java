@@ -9,6 +9,7 @@ import lombok.Setter;
 import java.util.UUID;
 
 
+// This is a schema/model for the "user_reactions" Entity
 @Getter
 @Setter
 @NoArgsConstructor

@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+
+// This is a controller advice class which overrides the default calls for exception handling
 @ControllerAdvice
 public class ControllerAdvices {
 

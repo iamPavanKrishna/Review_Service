@@ -8,9 +8,11 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+
+// This a Data Access Layer for the Review Database
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, UUID> {
     
-    List<Review> getAllReviewsByServiceId(UUID id);
-    List<Review> getAllReviewsByUserId(UUID id);
+    List<Review> getAllReviewsByServiceId(UUID id);  // This method fetches all the reviews by the service id
+    List<Review> getAllReviewsByUserId(UUID id);  // This method fetches all the reviews by the user id
 }

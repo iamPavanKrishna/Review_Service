@@ -14,6 +14,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.util.Date;
 import java.util.UUID;
 
+
+// This is a schema/model for the "reviews" Entity
 @Getter
 @Setter
 @Builder
