@@ -1,7 +1,7 @@
 package com.group4.reviewservice.review_service;
 
 
-import com.group4.reviewservice.NotificationsService.NotificationServiceCall;
+import com.group4.reviewservice.ThirdPartyServices.NotificationServiceCallImpl;
 import com.group4.reviewservice.enums.ReactionTypeEnum;
 import com.group4.reviewservice.models.Review;
 import com.group4.reviewservice.models.UserReaction;
