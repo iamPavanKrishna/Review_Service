@@ -6,3 +6,4 @@ import com.group4.reviewservice.dtos.responses.NotificationResponse;
 public interface NotificationServiceCall {
      public NotificationResponse sendnotification(NotificationRequest notificationRequest, String url);
 }
+

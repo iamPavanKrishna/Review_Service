@@ -16,31 +16,31 @@ public interface ReviewService {
 
         // This is an abstract method for submitting a review
         public Review submitReview(Review review) 
-                throws NotFoundException, TPAServiceException, InternalServerException;
+                throws NotFoundException, TPAServiceException, InternalServerException, BadRequestException;
 
         // This is an abstract method to fetch all the reviews
         public List<Review> getAllReviews()   
                 throws NotFoundException, InternalServerException;
 
         // This is an abstract method to fetch all the reviews by serviceId
-        List<Review> getAllReviewsByServiceId(UUID id)   
-                throws NotFoundException, BadRequestException;
+        List<Review> getAllReviewsByServiceId(UUID id)
+                throws BadRequestException;
 
         // This is an abstract method to fetch all the reviews by userId
         List<Review> getAllReviewsByUserId(UUID id)   
-                throws NotFoundException, InternalServerException, BadRequestException;
+                throws BadRequestException;
 
         // This is an abstract method to fetch a review  by id
         public Optional<Review> getReviewById(String id) 
-                throws NotFoundException, InternalServerException, BadRequestException;
+                throws BadRequestException, InternalServerException;
 
         // This is an abstract method for updating a review
         public Review updateReview(Review review)   
-                throws NotFoundException, InternalServerException, BadRequestException, TPAServiceException;
+                throws InternalServerException, BadRequestException, TPAServiceException;
 
         // This is an abstract method for deleting a review
-        public void deleteReview(String id)
-                throws NotFoundException, BadRequestException, TPAServiceException, InternalServerException;
+        public String deleteReview(String id)
+                throws BadRequestException, TPAServiceException, InternalServerException;
 
         // This is an abstract method for adding a reaction to the review
         public void reactToReview(UUID review, ReactionTypeEnum reactionTypeEnum, UUID userId) 

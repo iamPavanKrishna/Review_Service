@@ -4,7 +4,6 @@ package com.group4.reviewservice;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.core.env.MapPropertySource;

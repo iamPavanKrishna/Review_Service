@@ -43,40 +43,43 @@ public class ReviewServiceImpl implements ReviewService{
     // This is the implementation of the abstract method for submitting a review
     @Override
     public Review submitReview(Review review) 
-        throws NotFoundException, TPAServiceException, InternalServerException {
-        Review respReview = new Review();
-
+        throws NotFoundException, TPAServiceException, InternalServerException, BadRequestException {
         try {
-            respReview = reviewRepository.save(review);
+           reviewRepository.save(review);            
         } catch (Exception e) {
             throw new InternalServerException("Internal Server Error: Error Submitting Review");
-        }
+        }    
+        Review respReview = getReviewById(review.getId().toString()).get();
         // Sending Notification to the specified user
-        NotificationRequest notificationRequesttoUser = new NotificationRequest(
+            NotificationRequest notificationRequesttoUser = new NotificationRequest(
                 respReview.getServiceId().toString(),
                 "Review is successfully submitted",
                 "https://logowik.com/content/uploads/images/mail-notification4831.jpg",
                 "email",
                 "alert",
-                "Review submitted");
-        // Sending Notification to the specified user
-        NotificationRequest notificationRequest = new NotificationRequest(
+                "Review submitted"
+            );
+    
+            // Sending Notification to the specified user
+            NotificationRequest notificationRequest = new NotificationRequest(
                 respReview.getServiceId().toString(),
                 "Checkout the new review for your service that you have subscribed",
                 "https://logowik.com/content/uploads/images/mail-notification4831.jpg",
                 "email",
                 "alert",
-                "New Review received for your service");
-        try {
-
+                "New Review received for your service"
+            );
+    
             String toUserUrl = baseNotificationUrl + "/" + respReview.getUserId().toString();
 
+            try {
             notificationServiceCall.sendnotification(notificationRequesttoUser, toUserUrl);
-            notificationServiceCall.sendnotification(notificationRequest, baseNotificationUrl);
-        } catch (Exception e) {
-            throw new TPAServiceException(e.getMessage());
-        }
-        return respReview;            
+            notificationServiceCall.sendnotification(notificationRequest, baseNotificationUrl);                      
+            } catch (Exception e) {
+                throw new TPAServiceException("Some error occured while sending notification");
+            }
+    
+        return respReview;
     }
 
 
@@ -84,105 +87,94 @@ public class ReviewServiceImpl implements ReviewService{
     @Override
     public List<Review> getAllReviews()   
         throws NotFoundException, InternalServerException {
-        List<Review> review = new ArrayList<>();
         try {
-            reviewRepository.findAll().forEach(review::add);
+            List<Review> resp = reviewRepository.findAll();
+            List<Review> reviews = new ArrayList<>();
+            for (Review review : resp) {
+                reviews.add(review);
+            }
+            return reviews;
         } catch (Exception e) {
-            throw new NotFoundException("No reviews not found!");
+            throw new InternalServerException("Internal Server Error: Unable to fetch reviews at the moment...");
         }
 
-        return review;
+        
     }
 
     @Override
     public List<Review> getAllReviewsByServiceId(UUID id)
-        throws NotFoundException, BadRequestException {
-        if (id == null) {
+            throws BadRequestException {
+        if (id == null || id.toString().isEmpty()) {
                 throw new BadRequestException("Service ID is required");
             }
-        try{
-            return reviewRepository.getAllReviewsByServiceId(id);
-        } catch (Exception e) {
-            throw new NotFoundException("No Review is found with serviceId: "+id);
-        }
+        List<Review> resp =  reviewRepository.getAllReviewsByServiceId(id);
+        return resp;
+        
     }
 
     @Override
     public List<Review> getAllReviewsByUserId(UUID id)    
-        throws NotFoundException, InternalServerException, BadRequestException {
+        throws BadRequestException {
         if (id == null) {
             throw new BadRequestException("User ID is required");
         }
-        try{
-            return reviewRepository.getAllReviewsByUserId(id);
-        } catch (Exception e) {
-            throw new InternalServerException("Internal Server Error: Unable to fetch reviews at the moment...");
-        }
+        List<Review> resp = reviewRepository.getAllReviewsByUserId(id);
+        return resp;
 
     }
 
     @Override
     public Optional<Review> getReviewById(String id) 
-        throws NotFoundException, InternalServerException, BadRequestException {
+        throws BadRequestException, InternalServerException {
         if (id == null || id.isEmpty()) {
             throw new BadRequestException("Review ID is required");
         }
+        Optional<Review> reviewOptional;
         try {
-            Optional<Review> reviewOptional = reviewRepository.findById(UUID.fromString(id));
-            if (!reviewOptional.isPresent()) {
-                throw new NotFoundException("Review not found with ID: " + id);
-            }
-            return reviewOptional;
+            reviewOptional = reviewRepository.findById(UUID.fromString(id));
         } catch (Exception e) {
-            throw new NotFoundException(e.getMessage());
+            throw new InternalServerException("Internal Server Error: Unable to fetch reviews at the moment...");
         }
+        return reviewOptional;
     }
 
     @Override
-    public Review updateReview(Review review)   
-        throws NotFoundException, InternalServerException, BadRequestException, TPAServiceException {
+    public Review updateReview(Review review)
+            throws InternalServerException, BadRequestException, TPAServiceException {
         if (review.getId() == null || review.getId().toString().isEmpty()) {
             throw new BadRequestException("Review ID is required");
         }
-            Review respReview = new Review();
-
         try {
-            respReview = reviewRepository.save(review);
-
-        } catch (Exception e) {
-            throw new InternalServerException("Internal Server Error: Error Updating Review" + e.getMessage());
-        }
-        NotificationRequest notificationRequest = new NotificationRequest(
+            Review respReview = reviewRepository.save(review);
+    
+            // Sending Notification to the specified user
+            NotificationRequest notificationRequest = new NotificationRequest(
                 respReview.getServiceId().toString(),
                 "Review is successfully updated",
                 "https://logowik.com/content/uploads/images/mail-notification4831.jpg",
                 "email",
                 "alert",
-                "Review updated");
-        try {
-
+                "Review updated"
+            );
+    
             String url = baseNotificationUrl + "/" + respReview.getUserId().toString();
-
+    
             notificationServiceCall.sendnotification(notificationRequest, url);
+    
+            return respReview;
         } catch (Exception e) {
-            throw new TPAServiceException("Notification Service is down");
+            throw new InternalServerException("Internal Server Error: Error Updating Review\n" + e.getMessage());
         }
-        
-        return respReview;
     }
 
     @Override
-    public void deleteReview(String id)
-            throws NotFoundException, BadRequestException, TPAServiceException, InternalServerException {
-        Review respReview = getReviewById(id).orElseThrow(() -> new NotFoundException("Review not found with ID: " + id));
+    public String deleteReview(String id)
+            throws BadRequestException, TPAServiceException, InternalServerException {
         if (id == null || id.isEmpty()) {
             throw new BadRequestException("Review ID is required");
         }
-        try {
-            reviewRepository.deleteById(UUID.fromString(id));
-        } catch (Exception e) {
-            throw new NotFoundException("Review not found with ID: " + id);
-        }
+        Review respReview = getReviewById(id).get();
+        reviewRepository.deleteById(UUID.fromString(id));
         NotificationRequest notificationRequest = new NotificationRequest(
             respReview.getServiceId().toString(), 
             "Review is successfully deleted", 
@@ -194,8 +186,9 @@ public class ReviewServiceImpl implements ReviewService{
             String url = baseNotificationUrl + "/" +  respReview.getUserId().toString();
             notificationServiceCall.sendnotification(notificationRequest, url);
        } catch (Exception e) {
-           throw new TPAServiceException("Notification Service is down");
+           throw new TPAServiceException("Some error occured while sending notification");
        }
+       return "Review deleted successfully";
     }
 
     public void reactToReview(UUID reviewId, ReactionTypeEnum reactionType, UUID userId)
@@ -238,7 +231,7 @@ public class ReviewServiceImpl implements ReviewService{
                     String url = baseNotificationUrl + "/" +  review.getUserId().toString();
                     notificationServiceCall.sendnotification(notificationRequest, url);
                 } catch (Exception e) {
-                    throw new TPAServiceException(e.getMessage());
+                    throw new TPAServiceException("Some error occured while sending notification");
                 }
             }
         }
