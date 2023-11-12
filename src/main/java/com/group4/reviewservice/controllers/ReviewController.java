@@ -85,11 +85,14 @@ public class ReviewController {
         Review reviewToUpdate = new Review();
 
         reviewToUpdate.setId(UUID.fromString(id));
-        reviewToUpdate.setUserId(updateReviewInput.userId());
-        reviewToUpdate.setServiceId(updateReviewInput.serviceId());
+        reviewToUpdate.setUserId(review.get().getUserId());
+        reviewToUpdate.setServiceId(review.get().getServiceId());
         reviewToUpdate.setText(updateReviewInput.text());
         reviewToUpdate.setAttachmentTypeEnum(updateReviewInput.attachmentTypeEnum());
         reviewToUpdate.setAttachmentUrl(updateReviewInput.attachmentUrl());
+        reviewToUpdate.setUsefulCount(review.get().getUsefulCount());
+        reviewToUpdate.setFunnyCount(review.get().getFunnyCount());
+        reviewToUpdate.setCoolCount(review.get().getCoolCount());
 
         Review reviewUpdated = reviewService.updateReview(reviewToUpdate);
 
@@ -100,6 +103,7 @@ public class ReviewController {
     @DeleteMapping({"/delete/{id}"})
     public ResponseEntity<Void> deleteTask(@PathVariable String id)  
             throws NotFoundException, InternalServerException, BadRequestException, TPAServiceException {
+        reviewService.deleteReviewfromUserReaction(UUID.fromString(id));
         reviewService.deleteReview(id);
         return ResponseEntity.noContent().build();
     }
@@ -107,7 +111,7 @@ public class ReviewController {
     // API route to add user specific reaction to the review
     @PostMapping("/react/{reviewId}/{reactionType}/{userId}")
     public ResponseEntity<Void> reactToReview(@PathVariable String reviewId, @PathVariable String reactionType, @PathVariable String userId) 
-            throws NotFoundException, InternalServerException, BadRequestException {
+            throws NotFoundException, InternalServerException, BadRequestException, TPAServiceException {
         reviewService.reactToReview(UUID.fromString(reviewId), ReactionTypeEnum.fromString(reactionType), UUID.fromString(userId));
         return ResponseEntity.noContent().build();
     }
