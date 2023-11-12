@@ -1,6 +1,9 @@
 package com.group4.reviewservice.services;
 
+import com.group4.reviewservice.ThirdPartyServices.NotificationServiceCallImpl;
+import com.group4.reviewservice.ThirdPartyServices.UserServiceCallImpl;
 import com.group4.reviewservice.dtos.requests.NotificationRequest;
+import com.group4.reviewservice.dtos.responses.UserResponse;
 import com.group4.reviewservice.enums.ReactionTypeEnum;
 import com.group4.reviewservice.exceptions.*;
 import com.group4.reviewservice.models.Review;
@@ -13,10 +16,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.group4.reviewservice.NotificationsService.NotificationServiceCall;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 // This is the Implementation of the Service Calls
@@ -27,8 +32,12 @@ public class ReviewServiceImpl implements ReviewService{
 
     private final ReviewRepository reviewRepository;
     private final UserReactionRepository userReactionRepository;
-    private final NotificationServiceCall tpaServiceCall;
-    private String baseNotificationUrl = "http://notificationservice.eu-north-1.elasticbeanstalk.com/notification/send/";
+    private final NotificationServiceCallImpl notificationServiceCall;
+    private final UserServiceCallImpl userServiceCall;
+    
+    @Value("${NOTIFICATIONSERVICE_URL}")
+    private String baseNotificationUrl;
+    
 
 
     // This is the implementation of the abstract method for submitting a review
@@ -42,21 +51,30 @@ public class ReviewServiceImpl implements ReviewService{
         } catch (Exception e) {
             throw new InternalServerException("Internal Server Error: Error Submitting Review");
         }
-        // Calling the Third Party Notification Service
-        NotificationRequest notificationRequest = new NotificationRequest(
+        // Sending Notification to the specified user
+        NotificationRequest notificationRequesttoUser = new NotificationRequest(
                 respReview.getServiceId().toString(),
                 "Review is successfully submitted",
                 "https://logowik.com/content/uploads/images/mail-notification4831.jpg",
                 "email",
                 "alert",
                 "Review submitted");
+        // Sending Notification to the specified user
+        NotificationRequest notificationRequest = new NotificationRequest(
+                respReview.getServiceId().toString(),
+                "Checkout the new review for your service that you have subscribed",
+                "https://logowik.com/content/uploads/images/mail-notification4831.jpg",
+                "email",
+                "alert",
+                "New Review received for your service");
         try {
 
-            String url = baseNotificationUrl + respReview.getUserId().toString();
+            String toUserUrl = baseNotificationUrl + "/" + respReview.getUserId().toString();
 
-            tpaServiceCall.sendnotification(notificationRequest, url);
+            notificationServiceCall.sendnotification(notificationRequesttoUser, toUserUrl);
+            notificationServiceCall.sendnotification(notificationRequest, baseNotificationUrl);
         } catch (Exception e) {
-            throw new TPAServiceException("Notification Service is down");
+            throw new TPAServiceException(e.getMessage());
         }
         return respReview;            
     }
@@ -143,9 +161,9 @@ public class ReviewServiceImpl implements ReviewService{
                 "Review updated");
         try {
 
-            String url = baseNotificationUrl + respReview.getUserId().toString();
+            String url = baseNotificationUrl + "/" + respReview.getUserId().toString();
 
-            tpaServiceCall.sendnotification(notificationRequest, url);
+            notificationServiceCall.sendnotification(notificationRequest, url);
         } catch (Exception e) {
             throw new TPAServiceException("Notification Service is down");
         }
@@ -173,15 +191,15 @@ public class ReviewServiceImpl implements ReviewService{
             "alert", 
             "Review deleted");
         try {
-            String url = baseNotificationUrl + respReview.getUserId().toString();
-            tpaServiceCall.sendnotification(notificationRequest, url);
+            String url = baseNotificationUrl + "/" +  respReview.getUserId().toString();
+            notificationServiceCall.sendnotification(notificationRequest, url);
        } catch (Exception e) {
            throw new TPAServiceException("Notification Service is down");
        }
     }
 
     public void reactToReview(UUID reviewId, ReactionTypeEnum reactionType, UUID userId)
-        throws NotFoundException, InternalServerException, BadRequestException {
+        throws NotFoundException, InternalServerException, BadRequestException, TPAServiceException {
         if (reviewId == null || reviewId.toString().isEmpty()) {
             throw new BadRequestException("Review ID is required");
         }
@@ -207,8 +225,30 @@ public class ReviewServiceImpl implements ReviewService{
                 userReactionRepository.save(userReaction);
 
                 incrementReactionCount(review, reactionType);
+                String data = fetchuserdetails(userId) + " reacted to your review";
+
+                NotificationRequest notificationRequest = new NotificationRequest(
+                    review.getServiceId().toString(), 
+                    data, 
+                    "https://logowik.com/content/uploads/images/mail-notification4831.jpg", 
+                    "email",
+                    "alert", 
+                    "New Reaction received for your review");
+                try {
+                    String url = baseNotificationUrl + "/" +  review.getUserId().toString();
+                    notificationServiceCall.sendnotification(notificationRequest, url);
+                } catch (Exception e) {
+                    throw new TPAServiceException(e.getMessage());
+                }
             }
         }
+    }
+
+    public String fetchuserdetails(UUID userId) throws TPAServiceException {
+        UserResponse response = userServiceCall.getUserDetails(userId.toString());
+
+        return response.name().toString() + "(" + response.email().toString() + ")";
+
     }
 
     public void incrementReactionCount(Review review, ReactionTypeEnum reactionType) {
@@ -239,5 +279,13 @@ public class ReviewServiceImpl implements ReviewService{
                 break;
         }
         reviewRepository.save(review);
+    }
+
+    @Transactional
+    public void deleteReviewfromUserReaction(UUID reviewId) {
+        Review review = reviewRepository.findById(reviewId).orElse(null);
+        if (review != null) {
+            userReactionRepository.deleteByReview(review);
+        }
     }
 }

@@ -44,6 +44,6 @@ public interface ReviewService {
 
         // This is an abstract method for adding a reaction to the review
         public void reactToReview(UUID review, ReactionTypeEnum reactionTypeEnum, UUID userId) 
-                throws NotFoundException, InternalServerException, BadRequestException;
+                throws NotFoundException, InternalServerException, BadRequestException, TPAServiceException;
         
 }

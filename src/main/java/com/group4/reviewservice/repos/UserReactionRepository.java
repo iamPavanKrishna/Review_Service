@@ -16,4 +16,5 @@ import org.springframework.stereotype.Repository;
 public interface UserReactionRepository extends JpaRepository<UserReaction, UUID> {
     
     Optional<UserReaction> findByReviewAndUserIdAndReactionType(Review review, UUID userId, ReactionTypeEnum reactionType);  // This method fetches the review by mapping review, userId, reactionType
+    void deleteByReview(Review review);  // This method deletes the review by mapping review
 }
